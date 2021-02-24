@@ -99,9 +99,9 @@ int basics_sem_main()
 
     // four threads, four handles
     HANDLE  hThread1,
-        hThread2,
-        hThread3,
-        hThread4;
+            hThread2,
+            hThread3,
+            hThread4;
 
     int arg[4][2];      // arguments to the functions
 

@@ -8,14 +8,14 @@ void main(void)
 	// basics_main();
 
 	// basics of processes
-	basics_processes();
+	// basics_processes();
 
 	// using _spawn to create a new process
 	// main_spawn();
 
-	// semaphores
-	// basics_sem_main();
+	// semaphores, example from Visual studio
+	// main_sem();	
 
 	// semaphores example - extended example from the previous lectures
-	// main_sem();
+	// basics_sem_main();
 }
