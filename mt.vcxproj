@@ -147,6 +147,7 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="pThreadExample.c" />
     <ClCompile Include="pThreadExample_failsafe.c" />
+    <ClCompile Include="semaphores_posix_example.c" />
     <ClCompile Include="semaphore_example_visual_studio_docs.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
