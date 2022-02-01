@@ -22,7 +22,7 @@ int main_spawn(void)
 
     // creating the new process
     // and wait until it finishes
-    _spawnv(P_NOWAIT,                             // wait for the program to finish, try _P_DETACH, _P_NOWAIT or _P_OVERLAY
+    _spawnv(P_NOWAIT,                           // wait for the program to finish, try _P_DETACH, _P_NOWAIT or _P_OVERLAY
             "c:/Windows/system32/notepad.exe",  // What we execute
             my_args);                           // argument list
 

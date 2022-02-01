@@ -11,7 +11,7 @@ void main(void)
 	// basics_processes();
 
 	// using _spawn to create a new process
-	// main_spawn();
+	main_spawn();
 
 	// semaphores, example from Visual studio
 	// main_sem();	

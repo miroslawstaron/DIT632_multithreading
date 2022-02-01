@@ -41,7 +41,7 @@ void calculate_sum(int* args)
         iSum += i;
     }
 
-    // Sleep(1000);
+    Sleep(1000);
 
     // notify the we have reached the end
     printf("%s, ID %d, result: %ld\n", "Thread function ends", iThreadID, iSum);
@@ -91,7 +91,7 @@ void basics_main()
     printf("%s", "In main, taking a nap... \n");
 
     // we do some sleep to see what happens
-    Sleep(10);
+    // Sleep(10);
 
     // write that we are in main
     printf("%s", "In main, finished my nap... \n");
@@ -101,7 +101,7 @@ void basics_main()
     WaitForSingleObject(hThread2, INFINITE);
     WaitForSingleObject(hThread3, INFINITE);
     WaitForSingleObject(hThread4, INFINITE);
-
+    
     // and that's it
     printf("%s", "Main ends! \n");
 }
