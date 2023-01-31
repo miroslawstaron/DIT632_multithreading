@@ -39,6 +39,7 @@ void calculate_sum(int* args)
 
         // if not, then we add to the sum
         iSum += i;
+        args[2] = iSum;
     }
 
     Sleep(1000);
@@ -63,7 +64,7 @@ void basics_main()
         hThread3,
         hThread4;
 
-    int arg[4][2];      // arguments to the functions
+    int arg[4][3];      // arguments to the functions
 
     // the first thread
     arg[0][0] = 10;
@@ -87,6 +88,8 @@ void basics_main()
     hThread3 = _beginthread(calculate_sum, 10, arg[2]);
     hThread4 = _beginthread(calculate_sum, 10, arg[3]);
 
+    printf("Handler 1: %x\n", hThread1);
+
     // write that we are in main
     printf("%s", "In main, taking a nap... \n");
 
@@ -101,6 +104,13 @@ void basics_main()
     WaitForSingleObject(hThread2, INFINITE);
     WaitForSingleObject(hThread3, INFINITE);
     WaitForSingleObject(hThread4, INFINITE);
+
+	printf("From Thread 1: %d\n", arg[0][2]);
+	printf("From Thread 2: %d\n", arg[1][2]);
+	printf("From Thread 3: %d\n", arg[2][2]);
+	printf("From Thread 4: %d\n", arg[3][2]);
+    
+    
     
     // and that's it
     printf("%s", "Main ends! \n");
