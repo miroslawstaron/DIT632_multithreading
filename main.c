@@ -5,7 +5,7 @@
 void main(void)
 {
 	// basics of threads
-	basics_main();
+	// basics_main();
 
 	// basics of processes
 	// basics_processes();
@@ -17,5 +17,5 @@ void main(void)
 	// main_sem();	
 
 	// semaphores example - extended example from the previous lectures
-	// basics_sem_main();
+	basics_sem_main();
 }

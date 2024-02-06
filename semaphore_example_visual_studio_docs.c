@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 #define MAX_SEM_COUNT 1        // The number of semaphores to create
-#define THREADCOUNT 3          // The number of threads to coordinate
+#define THREADCOUNT 30          // The number of threads to coordinate
 
 HANDLE ghSemaphore;             // Global handle to semaphores
 
@@ -90,7 +90,7 @@ DWORD WINAPI ThreadProc(LPVOID lpParam)
         // Try to enter the semaphore 
         dwWaitResult = WaitForSingleObject(
             ghSemaphore,   // handle to semaphore
-            1000L);           // zero-second time-out interval
+            10L);           // zero-second time-out interval
 
         switch (dwWaitResult)
         {
@@ -104,6 +104,7 @@ DWORD WINAPI ThreadProc(LPVOID lpParam)
                 // Simulate thread spending time on task
                 Sleep(1000);
 
+                
                 // Release the semaphore when task is finished
                 // this is important, otherwise it will lead to a deadlock
                 if (!ReleaseSemaphore(

@@ -34,6 +34,7 @@ void basics_processes()
 
 	// CreateProcess is the main function to
 	// create the new process
+	//if (!CreateProcess(L"C:\\Users\\miros\\Documents\\Code\\DIT632_multithreading\\Debug\\mt.exe",
 	if (!CreateProcess(L"C:\\WINDOWS\\system32\\notepad.exe", // module name which is the Windows cmd command, it should be an L-string. 
 		NULL, // Command line.
 		NULL, // Process handle not inheritable.

@@ -31,7 +31,7 @@ void calculate_sum_sem(int* args)
     
     dwWaitResult = WaitForSingleObject(
         ghSemaphore,   // handle to semaphore
-        10L);           // zero-second time-out interval
+        1L);           // zero-second time-out interval
 
     switch (dwWaitResult)
     {
@@ -54,6 +54,7 @@ void calculate_sum_sem(int* args)
 
                 // if not, then we add to the sum
                 iSum += i;
+				printf("Thread %d, iSum %d\n", iThreadID, iSum);
             }
 
             // notify the we have reached the end
