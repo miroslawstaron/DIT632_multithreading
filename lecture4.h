@@ -7,3 +7,6 @@ int main_processes_posix(void);
 
 // pthread example
 int main_pthread();
+
+// dining philosophers problem
+int main_philosophers(int argc, char *argv[]);

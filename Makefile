@@ -5,7 +5,7 @@ CC = gcc
 CFLAGS = -Wall -g -Wno-unused-variable -Wno-unused-function
 
 # Source files
-SRCS = main.c basic_processes_posix.c semaphores_posix_example.c pThreadExample_failsafe.c
+SRCS = main.c basic_processes_posix.c semaphores_posix_example.c pThreadExample_failsafe.c dining_philo.c
 
 # Object files
 OBJS = $(SRCS:.c=.o)

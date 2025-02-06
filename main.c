@@ -24,13 +24,16 @@ int main(int argc, char *argv[])
 	// basics_sem_main();
 
 	// pthread example
-	main_pthread();
+	// main_pthread();
 
 	// processes example - POSIX version
 	// main_processes_posix();
 
 	// sempahores example - POSIX version
 	// main_semaphores_posix();
+
+	// dining philosophers example - POSIX version
+	main_philosophers(argc, argv);
 
 	return 0;
 }

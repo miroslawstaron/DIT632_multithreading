@@ -1,167 +1,111 @@
-#include<stdio.h>
-#include<pthread.h>
-#include<stdlib.h>
-#include<unistd.h>
+/*
+* The solution to the dining philosophers problem using threads in C
+* source: rosettacode.org
+* modifications - Github CoPilot (mostly comments)
+*/
 
-#define MAX_MEALS 50
-#define MAX_WAIT_TIME 3000000
-#define NUMBER_OF_PHILOSOPHERS 7
-#define WORK_TIME 3
+#include <stdio.h>
+#include <threads.h>
+#include <stdlib.h>
 
-// Taken from https://gist.github.com/theawless/88e78ba6979865e43289be37f9f01d47
+// the number of philosophers
+#define NUM_THREADS 5
 
-enum states
-{
-    THINKING, EATING, HUNGRY
-};
+struct timespec time1;
 
-struct TheDiningPhilosophers
-{
-    pthread_mutex_t lock;
-    enum states state[NUMBER_OF_PHILOSOPHERS];
-    pthread_cond_t condition[NUMBER_OF_PHILOSOPHERS];
-    long total_wait_time[NUMBER_OF_PHILOSOPHERS];
-    long count[NUMBER_OF_PHILOSOPHERS];
-};
+// mutex for each fork == each philosopher
+mtx_t forks[NUM_THREADS];
 
-struct TheDiningPhilosophers diningPhilosophers;
+// Philosopher struct
+// links each philosopher to their left and right fork
+typedef struct {
+	char *name;
+	int left;
+	int right;
+} Philosopher;
 
-long wait_temp[NUMBER_OF_PHILOSOPHERS];
+// create a philosopher
+// takes in the name of the philosopher and the index of the left and right fork
+Philosopher *create(char *nam, int lef, int righ) {
+	// Allocate memory for a new Philosopher struct
+    Philosopher *x = malloc(sizeof(Philosopher));
 
-/* we will exit from a child thread without caring about memory leaks*/
-void exit_gracefully()
-{
-    long sum = 0;
-    printf("Total waiting time: ");
-    for (int k = 0; k < NUMBER_OF_PHILOSOPHERS; k++)
-    {
-        sum += diningPhilosophers.total_wait_time[k];
-        printf("%f ", (float) diningPhilosophers.total_wait_time[k] / 1000000);
-    }
-    printf("\n Avg waiting time = %f\n", (float) sum / (NUMBER_OF_PHILOSOPHERS * 1000000));
-    for (int k = 0; k < NUMBER_OF_PHILOSOPHERS; k++)
-    {
-        printf("%ld ", diningPhilosophers.count[k]);
-    }
-    printf("\n Ended successfully \n");
-    exit(0);
+    // Set the name of the philosopher
+    x->name = nam;
+
+    // Set the index of the left fork
+    x->left = lef;
+
+    // Set the index of the right fork
+    x->right = righ;
+	return x; 
 }
 
+// Function for a philosopher to eat
+int eat(void *data) {
+    // Set the sleep time to 1 second
+    time1.tv_sec = 1;
 
-/*Gets the clock time at this moment*/
-long get_posix_clock_time()
-{
-    struct timespec ts;
-    if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0)
-    {
-        return (long) (ts.tv_sec * 1000000000 + ts.tv_nsec);
-    }
+    // Cast the data to a Philosopher struct
+    Philosopher *foo = (Philosopher *) data;
+
+    // Lock the left fork
+    mtx_lock(&forks[foo->left]);
+
+    // Lock the right fork
+    mtx_lock(&forks[foo->right]);
+
+    // Print that the philosopher is eating
+    printf("%s is eating\n", foo->name);
+
+    // Sleep for the specified time
+    thrd_sleep(&time1, NULL);
+
+    // Print that the philosopher is done eating
+    printf("%s is done eating\n", foo->name);
+
+    // Unlock the left fork
+    mtx_unlock(&forks[foo->left]);
+
+    // Unlock the right fork
+    mtx_unlock(&forks[foo->right]);
+
+    // Return 0 to indicate success
     return 0;
 }
 
-void check_chopsticks(int i)
-{
-    printf("Philosopher %d looking for fork\n", i);
-    if (diningPhilosophers.state[i] == HUNGRY && (diningPhilosophers.state[(i + 1) % NUMBER_OF_PHILOSOPHERS] != EATING && diningPhilosophers.state[(i + NUMBER_OF_PHILOSOPHERS - 1) % NUMBER_OF_PHILOSOPHERS] != EATING) && self_run(i))
-    {
-        diningPhilosophers.state[i] = EATING;
+int main_philosophers(int argc, char *argv[]) {
+    // Array to hold thread IDs for each philosopher
+    thrd_t threadId[NUM_THREADS];
 
-        //wait time is equal to start time - time at this moment
-        wait_temp[i] += get_posix_clock_time();
-        diningPhilosophers.total_wait_time[i] += wait_temp[i];
-        //this does not unlock the mutex, need to unlock from parent function
-        pthread_cond_signal(&diningPhilosophers.condition[i]);
-    }
-}
+    // Array to hold all philosopher structs
+    Philosopher *all[NUM_THREADS] = {
+        create("Teral", 0, 1), 
+        create("Billy", 1, 2), 
+        create("Daniel", 2, 3), 
+        create("Philip", 3, 4),
+        create("Bennet", 0, 4)
+    };
 
-/*
-Atomic call, change state of philosopher to thinking
-Call the neighbours to check for free chopsticks
-*/
-void return_chopsticks(int philosopher_number)
-{
-    static int meal_no = 0;
-
-    pthread_mutex_lock(&diningPhilosophers.lock);
-    diningPhilosophers.count[philosopher_number]++;
-    diningPhilosophers.state[philosopher_number] = THINKING;
-    printf("Philosopher %d finish eating\n", philosopher_number);
-
-    meal_no++;
-    printf("#Eating count = %d\n\n", meal_no);
-    if (meal_no == MAX_MEALS)
-    {
-        exit_gracefully();
-    }
-    check_chopsticks((philosopher_number + NUMBER_OF_PHILOSOPHERS - 1) % NUMBER_OF_PHILOSOPHERS);
-    check_chopsticks((philosopher_number + 1) % NUMBER_OF_PHILOSOPHERS);
-    pthread_mutex_unlock(&diningPhilosophers.lock);
-}
-
-/*
-Atomic call, the philosopher becomes hungry
-Checks for free chopsticks, if not free then wait till signal
-*/
-void pickup_chopsticks(int philosopher_number)
-{
-    pthread_mutex_lock(&diningPhilosophers.lock);
-    diningPhilosophers.state[philosopher_number] = HUNGRY;
-    printf("Philosopher %d is starving\n", philosopher_number);
-
-    // saving start time
-    wait_temp[philosopher_number] = (-1) * get_posix_clock_time();
-
-    check_chopsticks(philosopher_number);
-    if (diningPhilosophers.state[philosopher_number] != EATING)
-    {
-        // need to already have the lock before calling this
-        // release the lock, so that other threads can use shared data
-        pthread_cond_wait(&diningPhilosophers.condition[philosopher_number], &diningPhilosophers.lock);
-    }
-    pthread_mutex_unlock(&diningPhilosophers.lock);
-}
-
-/*
-Runs infinitely for all philosophers in different threads
-Philosophers think and eat in this function
-*/
-void *philosopher(void *param)
-{
-    int philosopher_number = *(int *) param;
-    while (1)
-    {
-        srand(time(NULL) + philosopher_number);
-        int think_time = (rand() % WORK_TIME) + 1;
-        int eat_time = (rand() % WORK_TIME) + 1;
-        diningPhilosophers.state[philosopher_number] = THINKING;
-        printf("Philosopher %d is thinking for %d seconds\n", philosopher_number, think_time);
-        sleep(think_time);
-        pickup_chopsticks(philosopher_number);
-        printf("Philosopher %d is eating for %d seconds\n", philosopher_number, eat_time);
-        sleep(eat_time);
-        return_chopsticks(philosopher_number);
-    }
-}
-
-int main()
-{
-    /*Initialization code*/
-    pthread_t tid[NUMBER_OF_PHILOSOPHERS];
-    int id[NUMBER_OF_PHILOSOPHERS];
-    pthread_mutex_init(&diningPhilosophers.lock, NULL);
-    for (int j = 0; j < NUMBER_OF_PHILOSOPHERS; j++)
-    {
-        id[j] = j;
-        diningPhilosophers.state[j] = THINKING;
-        diningPhilosophers.count[j] = 0;
-        diningPhilosophers.total_wait_time[j] = 0;
-        wait_temp[j] = 0;
-        pthread_create(&tid[j], NULL, &philosopher, &id[j]);
+    // Initialize mutexes for each fork
+    for (int i = 0; i < NUM_THREADS; i++) {
+        if (mtx_init(&forks[i], mtx_plain) != thrd_success) {
+            puts("FAILED IN MUTEX INIT!");
+            return 0;
+        }
     }
 
-    // main thread must keep running when other threads are running
-    for (int j = 0; j < NUMBER_OF_PHILOSOPHERS; j++)
-    {
-        pthread_join(tid[j], NULL);
+    // Create threads for each philosopher
+    for (int i = 0; i < NUM_THREADS; ++i) {
+        if (thrd_create(threadId + i, eat, all[i]) != thrd_success) {
+            printf("%d-th thread create error\n", i);
+            return 0;
+        }
     }
+
+    // Wait for all threads to finish
+    for (int i = 0; i < NUM_THREADS; ++i)
+        thrd_join(threadId[i], NULL);
+
+    return 0;
 }
