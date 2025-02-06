@@ -9,6 +9,7 @@
 #ifndef WIN32
 
 #include <pthread.h>
+#include <unistd.h>
 #include <stdio.h>
 
 /*
@@ -16,14 +17,14 @@
 * @param args -- here we use an array
 * return: the sum or 0 if the number is too large
 */
-void* calculate_sum(int* args)
+void* calculate_sum(void* args)
 {
 	unsigned long iSum = 0;         // declare the result
 	int i = 0;                      // loop index
 
 	// unpacking the arguments to variables
-	int iLastNumber = args[0];
-	int iThreadID = args[1];
+	int iLastNumber = ((int *) args)[0];
+	int iThreadID = ((int *) args)[1];
 
 	// print information about the thread
 	printf("%s, ID: %d\n", "Thread function starts", iThreadID);
@@ -48,11 +49,12 @@ void* calculate_sum(int* args)
 	// notify the we have reached the end
 	printf("%s, ID %d, result: %ld\n", "Thread function ends", iThreadID, iSum);
 
-	// windows library function needed for the thread to end correctly
+	// return NULL as expected
+	return NULL;
 
 }
 
-int main()
+int main_pthread()
 {
 
 	printf("%s", "Starting main... \n");
@@ -82,10 +84,10 @@ int main()
 		ptrThread3;
 
 	// we create four threads and start them
-	pthread_create(&ptrThread0, NULL, calculate_sum, &arg[0])) {
+	if (pthread_create(&ptrThread0, NULL, calculate_sum, &arg[0])) {
 
-	fprintf(stderr, "Error creating thread\n");
-	return 1;
+		fprintf(stderr, "Error creating thread\n");
+		return 1;
 
 	}
 
@@ -117,7 +119,7 @@ int main()
 	printf("%s", "In main, taking a nap... \n");
 
 	// we do some sleep to see what happens
-	Sleep(10000);
+	sleep(10000);
 
 	// write that we are in main
 	printf("%s", "In main, finished my nap... \n");

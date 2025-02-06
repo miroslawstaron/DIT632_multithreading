@@ -3,15 +3,14 @@
 * Paste it to https://www.onlinegdb.com/
 */
 
-#ifndef WIN32
-
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdlib.h>
 
 
-int main(void) {
+int main_processes_posix(void) 
+{
 
     // process id of the child process
     pid_t child;
@@ -31,7 +30,4 @@ int main(void) {
     }
 
     return 0;
-
 }
-
-#endif

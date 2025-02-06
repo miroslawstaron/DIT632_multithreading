@@ -33,12 +33,14 @@ void* thread(void* arg)
     
     // releasing the semaphore
     sem_post(&mutex);
+
+    return NULL;
 }
 
 /*
 * Demonstration of the program using threads and semaphores
 */
-int main()
+int main_semaphores_posix()
 {
     // create the semaphore
     sem_init(&mutex, 0, 1);
