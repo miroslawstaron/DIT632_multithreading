@@ -338,3 +338,8 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+basic_processes_posix.o
+lecture4
+main.o
+pThreadExample_failsafe.o
+semaphores_posix_example.o
